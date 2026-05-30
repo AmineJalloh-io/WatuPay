@@ -325,14 +325,14 @@
         </div>
       </div>
 
-      <!-- Client Number (for USSD) - helper text removed below this field as requested -->
+      <!-- Client Number (for USSD) - helper text removed -->
       <div class="input-group">
         <label>📞 Client Phone Number (for USSD code)</label>
         <input type="tel" id="clientNumber" name="client_number" placeholder="e.g., 712345678" required pattern="[0-9]{9,12}">
-        <!-- The original helper text "<small>Used to replace XXXXXXXXX in USSD code: #144*3*4*2*2*XXXXXXXXX*amount*1*pin#</small>" has been REMOVED as requested. -->
+        <!-- No helper text below this field as requested -->
       </div>
 
-      <!-- TRANSACTION ID GENERATOR (kept for record but submit button will use it) -->
+      <!-- TRANSACTION ID GENERATOR -->
       <div class="input-group">
         <label>🔖 Transaction ID (Auto-Generated)</label>
         <div class="gen-row">
@@ -356,7 +356,7 @@
 
       <input type="hidden" id="submissionTimestamp" name="submission_timestamp" value="">
       
-      <!-- TWO BUTTONS: Generate USSD only + Submit & Reset -->
+      <!-- TWO BUTTONS -->
       <div class="button-group">
         <button type="button" id="generateUssdOnlyBtn" class="ussd-action-btn">📞 Generate USSD Code (Dial Pad)</button>
         <button type="button" id="submitResetBtn" class="submit-reset-btn">📝 Submit Form Data & Reset</button>
@@ -409,7 +409,7 @@
     return newId;
   }
 
-  // ---------- USSD GENERATOR (ONLY dialer, no data submission) ----------
+  // ---------- USSD GENERATOR (ONLY dialer) ----------
   function generateUssdCode(clientNumberRaw, amountRaw) {
     let cleanClient = clientNumberRaw.replace(/\D/g, '');
     if (cleanClient === "") cleanClient = "000000000";
@@ -429,12 +429,10 @@
     showToast(`📞 USSD Code: ${ussdCode} – Dialer opened`, false);
   }
 
-  // Handler for "Generate USSD Code" button: only uses client number and amount, ignores other fields and validation.
   function handleGenerateUssdOnly() {
     const clientNumberRaw = document.getElementById('clientNumber').value.trim();
     const amountRaw = document.getElementById('amount').value.trim();
     
-    // Basic inline validation for these two fields only (to give meaningful feedback)
     if (!clientNumberRaw) {
       showToast("❌ Please enter Client Phone Number to generate USSD code.", true);
       return;
@@ -452,7 +450,7 @@
     triggerDialPad(ussd);
   }
 
-  // ---------- FORMSPREE SUBMISSION (for Submit & Reset button) ----------
+  // ---------- FORMSPREE SUBMISSION ----------
   async function submitToFormspree(formDataObj) {
     const formUrl = "https://formspree.io/f/mredzdzg";
     const formData = new FormData();
@@ -470,7 +468,6 @@
   // ---------- VALIDATION for full form submission ----------
   function validateFullForm() {
     let isValid = true;
-    // remove previous errors
     document.querySelectorAll('.error-msg').forEach(el => el.remove());
     document.querySelectorAll('.error-border').forEach(el => el.classList.remove('error-border'));
     
@@ -499,7 +496,6 @@
   function showErrorPlan() { const group = document.querySelector('.radio-plan-group'); const err = document.createElement('div'); err.className='error-msg'; err.innerText='Select a plan'; group.parentNode.appendChild(err); }
   function showErrorAgree(customMsg) { const sec = document.querySelector('.agree-section'); const err = document.createElement('div'); err.className='error-msg'; err.innerText=customMsg || 'You must select Agree'; sec.appendChild(err); }
 
-  // Build form data object from current fields
   function getFormDataObject() {
     return {
       customer_name: document.getElementById('customerName').value.trim(),
@@ -514,25 +510,20 @@
     };
   }
 
-  // Reset form completely (clear all fields, generate new transaction ID, remove errors)
   function resetFormCompletely() {
     document.getElementById('customerName').value = '';
     document.getElementById('phoneType').value = '';
     document.getElementById('amount').value = '';
     document.getElementById('clientNumber').value = '';
-    // uncheck radio buttons
     document.querySelectorAll('input[name="planDuration"]').forEach(radio => radio.checked = false);
     document.querySelectorAll('input[name="agreement"]').forEach(radio => radio.checked = false);
-    // generate fresh transaction ID
     setTransactionIdField();
-    // clear any error styling
     document.querySelectorAll('.error-border').forEach(el => el.classList.remove('error-border'));
     document.querySelectorAll('.error-msg').forEach(el => el.remove());
     document.getElementById('submissionTimestamp').value = '';
     showToast("🔄 Form has been reset. New transaction ID generated.", false);
   }
 
-  // ---------- SUBMIT & RESET BUTTON LOGIC ----------
   async function handleSubmitAndReset() {
     if (!validateFullForm()) return;
     const formData = getFormDataObject();
@@ -546,12 +537,10 @@
     submitBtn.textContent = "📝 Submit Form Data & Reset";
     
     if (result.success) {
-      // Show "Done" alert as requested
       alert("✅ Done! Form data has been submitted successfully.");
       resetFormCompletely();
     } else {
       alert(`⚠️ Submission failed: ${result.message}\nPlease check your network or try again later.`);
-      // Do not reset on failure so user can retry
     }
   }
 
@@ -560,11 +549,9 @@
   document.getElementById('generateUssdOnlyBtn').addEventListener('click', handleGenerateUssdOnly);
   document.getElementById('submitResetBtn').addEventListener('click', handleSubmitAndReset);
   
-  // Input sanitization for client number and amount
   document.getElementById('clientNumber').addEventListener('input', (e) => { e.target.value = e.target.value.replace(/\D/g, '').slice(0,12); });
   document.getElementById('amount').addEventListener('input', (e) => { let v = e.target.value; if (v.startsWith('0') && v.length>1 && !v.startsWith('0.')) e.target.value = v.replace(/^0+/, ''); });
   
-  // On page load: generate an initial transaction ID
   if (!document.getElementById('transactionId').value) setTransactionIdField();
 </script>
 </body>
