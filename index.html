@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Watu Weekly - Smart Payment with SMS Alert</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>Watu Weekly · USSD & Form Submit Separated</title>
   <style>
     * {
       margin: 0;
@@ -23,14 +22,12 @@
     }
 
     .card {
-      max-width: 680px;
+      max-width: 720px;
       width: 100%;
       background: rgba(255, 255, 255, 0.97);
-      backdrop-filter: blur(0px);
       border-radius: 2rem;
       box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.35), 0 8px 18px rgba(0, 0, 0, 0.05);
       overflow: hidden;
-      transition: all 0.2s ease;
     }
 
     .header {
@@ -51,7 +48,6 @@
     .brand h1 {
       font-weight: 700;
       font-size: 1.8rem;
-      letter-spacing: -0.3px;
       background: linear-gradient(135deg, #FFE6B0, #FFB347);
       background-clip: text;
       -webkit-background-clip: text;
@@ -65,8 +61,6 @@
       font-size: 0.9rem;
       font-weight: 500;
       font-family: monospace;
-      letter-spacing: 0.5px;
-      box-shadow: inset 0 1px 2px rgba(0,0,0,0.1), 0 1px 0 rgba(255,255,255,0.1);
     }
 
     .sub {
@@ -80,7 +74,7 @@
     }
 
     .input-group {
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.3rem;
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
@@ -90,7 +84,6 @@
       font-weight: 600;
       color: #1f3e48;
       font-size: 0.9rem;
-      letter-spacing: -0.2px;
       display: flex;
       align-items: center;
       gap: 0.5rem;
@@ -109,6 +102,12 @@
     input:focus, select:focus {
       border-color: #f5b042;
       box-shadow: 0 0 0 3px rgba(245, 176, 66, 0.2);
+    }
+
+    input[readonly] {
+      background: #f5f9fe;
+      cursor: default;
+      border-color: #cddfe7;
     }
 
     .radio-plan-group {
@@ -139,7 +138,7 @@
       background: #fef7e6;
       border-radius: 1.2rem;
       padding: 1rem 1.5rem;
-      margin: 1.5rem 0 1.2rem;
+      margin: 1.2rem 0 1.2rem;
       border-left: 6px solid #f5b042;
     }
 
@@ -171,31 +170,74 @@
       height: 18px;
     }
 
-    .pay-btn {
-      background: #1f6392;
+    .gen-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .gen-row input {
+      flex: 3;
+    }
+
+    .gen-btn, .ussd-btn {
+      background: #2c5a6e;
+      border: none;
+      padding: 0.75rem 1.2rem;
+      border-radius: 2rem;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: 0.2s;
+      white-space: nowrap;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .gen-btn:hover, .ussd-btn:hover {
+      background: #1f4658;
+      transform: translateY(-1px);
+    }
+
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .ussd-action-btn {
       background: linear-gradient(95deg, #0f4c6b, #1a6d97);
       color: white;
       font-weight: 700;
-      font-size: 1.25rem;
-      padding: 1rem;
-      width: 100%;
+      font-size: 1.1rem;
+      padding: 0.9rem 1.2rem;
+      flex: 1;
       border: none;
       border-radius: 50px;
       cursor: pointer;
       transition: all 0.2s ease;
-      margin-top: 0.5rem;
-      box-shadow: 0 6px 14px rgba(0, 32, 64, 0.25);
-      letter-spacing: 0.5px;
+      box-shadow: 0 4px 10px rgba(0, 32, 64, 0.2);
     }
 
-    .pay-btn:hover {
-      background: linear-gradient(95deg, #0a3e58, #135e84);
+    .submit-reset-btn {
+      background: linear-gradient(95deg, #3c7a5a, #2b6a4a);
+      color: white;
+      font-weight: 700;
+      font-size: 1.1rem;
+      padding: 0.9rem 1.2rem;
+      flex: 1;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 10px rgba(0, 64, 32, 0.2);
+    }
+
+    .ussd-action-btn:hover, .submit-reset-btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
-    }
-
-    .pay-btn:active {
-      transform: translateY(1px);
+      filter: brightness(1.02);
     }
 
     .toast-msg {
@@ -209,7 +251,6 @@
       border-radius: 60px;
       font-weight: 500;
       z-index: 1000;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
       font-size: 0.9rem;
       pointer-events: none;
       transition: opacity 0.2s;
@@ -219,9 +260,6 @@
       color: #d14545;
       font-size: 0.75rem;
       margin-top: 0.3rem;
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
     }
 
     input.error-border {
@@ -229,25 +267,21 @@
       background: #fff8f8;
     }
 
-    .reminder-badge {
+    .info-badge {
       margin-top: 1rem;
       background: #eef2ff;
       border-radius: 30px;
       padding: 0.6rem 1rem;
-      font-size: 0.75rem;
+      font-size: 0.73rem;
       text-align: center;
       color: #1f6392;
-      font-weight: 600;
-      border: 1px solid #cbdff2;
+      font-weight: 500;
     }
 
-    @media (max-width: 550px) {
-      .form-container {
-        padding: 1.2rem;
-      }
-      .brand h1 {
-        font-size: 1.4rem;
-      }
+    @media (max-width: 600px) {
+      .form-container { padding: 1.2rem; }
+      .gen-row { flex-direction: column; align-items: stretch; }
+      .button-group { flex-direction: column; }
     }
   </style>
 </head>
@@ -259,21 +293,21 @@
       <h1>📱 WATU WEEKLY</h1>
       <div class="datetime-box" id="liveDateTime">— : —</div>
     </div>
-    <div class="sub">✅ Weekly phone payment · WatuSimu SL</div>
+    <div class="sub">✅ USSD Generator + Separate Form Submission</div>
   </div>
 
   <div class="form-container">
     <form id="paymentForm">
       <!-- Customer Name -->
       <div class="input-group">
-        <label>👤 Customer Full Name <i>(required)</i></label>
+        <label>👤 Customer Full Name</label>
         <input type="text" id="customerName" name="customer_name" placeholder="e.g., James Otieno" required>
       </div>
 
       <!-- Phone type -->
       <div class="input-group">
         <label>📱 Phone Type / Model</label>
-        <input type="text" id="phoneType" name="phone_type" placeholder="e.g., Samsung A15, Tecno Spark, iPhone 12" required>
+        <input type="text" id="phoneType" name="phone_type" placeholder="e.g., Samsung A15, Tecno Spark" required>
       </div>
 
       <!-- Amount -->
@@ -284,49 +318,53 @@
 
       <!-- Plan Radio Buttons -->
       <div class="input-group">
-        <label>📆 Payment Plan</label>
+        <label>📆 Installment Plan</label>
         <div class="radio-plan-group">
-          <label>
-            <input type="radio" name="planDuration" value="12 Months Plan" required> 12 Months Plan
-          </label>
-          <label>
-            <input type="radio" name="planDuration" value="9 Months Plan"> 9 Months Plan
-          </label>
+          <label><input type="radio" name="planDuration" value="12 Months Plan" required> 12 Months Plan</label>
+          <label><input type="radio" name="planDuration" value="9 Months Plan"> 9 Months Plan</label>
         </div>
       </div>
 
-      <!-- Client Number (XXXXXXXXX) used inside dial code and for SMS -->
+      <!-- Client Number (for USSD) -->
       <div class="input-group">
-        <label>📞 Client Phone Number (9-12 digits) <i>for USSD & SMS</i></label>
-        <input type="tel" id="clientNumber" name="client_number" placeholder="e.g., 712345678" required pattern="[0-9]{9,12}" title="Enter 9-12 digit phone number">
-        <small style="color:#4a6272;">This number recieves payment confirmation message soon as form is submitted.</small>
+        <label>📞 Client Phone Number (for USSD code)</label>
+        <input type="tel" id="clientNumber" name="client_number" placeholder="e.g., 712345678" required pattern="[0-9]{9,12}">
+        <small>Used to replace XXXXXXXXX in USSD code: #144*3*4*2*2*XXXXXXXXX*amount*1*pin#</small>
+      </div>
+
+      <!-- TRANSACTION ID GENERATOR (kept for record but submit button will use it) -->
+      <div class="input-group">
+        <label>🔖 Transaction ID (Auto-Generated)</label>
+        <div class="gen-row">
+          <input type="text" id="transactionId" name="transaction_id" readonly placeholder="Click generate to create ID" style="background:#fefcf5;">
+          <button type="button" id="generateTxBtn" class="gen-btn">🔄 Generate ID</button>
+        </div>
+        <small>Format: NW1234567.12345.M1234567</small>
       </div>
 
       <hr>
 
-      <!-- Compulsory Agree/Disagree Radio -->
+      <!-- Compulsory Agree/Disagree -->
       <div class="agree-section">
-        <div class="agree-title">📜 Terms & Consent (compulsory)</div>
+        <div class="agree-title">📜 Terms & Consent (compulsory for submission)</div>
         <div class="agree-options">
-          <label>
-            <input type="radio" name="agreement" value="Agree" required> ✅ I Agree to weekly payment terms
-          </label>
-          <label>
-            <input type="radio" name="agreement" value="Disagree"> ❌ I Disagree
-          </label>
+          <label><input type="radio" name="agreement" value="Agree" required> ✅ I Agree to weekly payment terms</label>
+          <label><input type="radio" name="agreement" value="Disagree"> ❌ I Disagree</label>
         </div>
-        <small style="display: block; margin-top: 8px;">* You must select Agree to proceed with payment and USSD dialer.</small>
+        <small>You must select Agree to submit the form.</small>
       </div>
 
-      <!-- hidden field for submission timestamp -->
       <input type="hidden" id="submissionTimestamp" name="submission_timestamp" value="">
-
-      <!-- Pay Button -->
-      <button type="button" id="payActionBtn" class="pay-btn">💳 Pay & Generate USSD Code</button>
       
-      <div class="reminder-badge">
-        ⏰ Auto-Reminder: After successful payment, you'll receive an alert saying <strong>"Pay Now"</strong> exactly <strong>6 days and 12 hours</strong> from submission.<br>
-        📲 Upon payment, an SMS will be sent to the client's phone number.
+      <!-- TWO BUTTONS: Generate USSD only + Submit & Reset -->
+      <div class="button-group">
+        <button type="button" id="generateUssdOnlyBtn" class="ussd-action-btn">📞 Generate USSD Code (Dial Pad)</button>
+        <button type="button" id="submitResetBtn" class="submit-reset-btn">📝 Submit Form Data & Reset</button>
+      </div>
+      
+      <div class="info-badge">
+        🔹 <strong>Generate USSD Code</strong> – only creates the USSD string and opens your phone dialer. No data is saved.<br>
+        🔹 <strong>Submit Form Data & Reset</strong> – validates all fields, sends data to Formspree, shows "Done" alert, then clears the form.
       </div>
     </form>
   </div>
@@ -335,184 +373,104 @@
 <div id="toastMessage" class="toast-msg" style="opacity:0; visibility: hidden;"></div>
 
 <script>
-  // ------------------- LIVE DATE & TIME UPDATER ------------------
+  // ------------------- LIVE DATE & TIME ------------------
   function updateDateTime() {
     const now = new Date();
-    const options = { 
-      weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
-      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
-    };
-    const formatted = now.toLocaleDateString('en-KE', options);
-    const dateTimeElem = document.getElementById('liveDateTime');
-    if (dateTimeElem) dateTimeElem.innerText = formatted;
+    const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+    document.getElementById('liveDateTime').innerText = now.toLocaleDateString('en-KE', options);
   }
   updateDateTime();
   setInterval(updateDateTime, 1000);
 
-  // Helper: show floating toast messages
   function showToast(message, isError = false) {
     const toast = document.getElementById('toastMessage');
     toast.innerText = message;
     toast.style.visibility = 'visible';
     toast.style.opacity = '1';
     toast.style.backgroundColor = isError ? '#9e2d2d' : '#1f3e48';
-    toast.style.color = '#fff9e8';
     setTimeout(() => {
       toast.style.opacity = '0';
-      setTimeout(() => {
-        toast.style.visibility = 'hidden';
-      }, 300);
-    }, 4500);
+      setTimeout(() => toast.style.visibility = 'hidden', 300);
+    }, 4000);
   }
 
-  // --------------- USSD Dialer Prefill with replacement --------------
+  // ---------- TRANSACTION ID GENERATOR ----------
+  function generateTransactionId() {
+    const rand7_1 = Math.floor(1000000 + Math.random() * 9000000).toString();
+    const rand5 = Math.floor(10000 + Math.random() * 90000).toString();
+    const rand7_2 = Math.floor(1000000 + Math.random() * 9000000).toString();
+    return `NW${rand7_1}.${rand5}.M${rand7_2}`;
+  }
+
+  function setTransactionIdField() {
+    const newId = generateTransactionId();
+    document.getElementById('transactionId').value = newId;
+    showToast(`🆔 New Transaction ID: ${newId}`, false);
+    return newId;
+  }
+
+  // ---------- USSD GENERATOR (ONLY dialer, no data submission) ----------
   function generateUssdCode(clientNumberRaw, amountRaw) {
     let cleanClient = clientNumberRaw.replace(/\D/g, '');
     if (cleanClient === "") cleanClient = "000000000";
-    let cleanAmount = amountRaw.replace(/[^0-9.]/g, '');
-    if (cleanAmount === "") cleanAmount = "0";
-    let amountInteger = Math.floor(parseFloat(cleanAmount));
-    if (isNaN(amountInteger)) amountInteger = 0;
+    let amountInteger = Math.floor(parseFloat(amountRaw) || 0);
     const pin = "1234";
-    // Format: #144*3*4*2*2*{clientNumber}*{amount}*1*{pin}#
-    const ussd = `#144*3*4*2*2*${cleanClient}*${amountInteger}*1*${pin}#`;
-    return ussd;
+    return `#144*3*4*2*2*${cleanClient}*${amountInteger}*1*${pin}#`;
   }
 
   function triggerDialPad(ussdCode) {
-    // For mobile: use tel: with # encoded as %23
-    let telUrl = "tel:" + ussdCode.replace(/#/g, '%23');
+    const telUrl = "tel:" + ussdCode.replace(/#/g, '%23');
     const link = document.createElement('a');
     link.href = telUrl;
     link.style.display = 'none';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    showToast(`📞 Dialer opened with USSD code`, false);
+    showToast(`📞 USSD Code: ${ussdCode} – Dialer opened`, false);
   }
 
-  // ------------- SEND AUTO SMS VIA SMS: protocol (sms:) -------------
-  // Function to auto-send a pre-filled SMS message to the client's phone number
-  // The message: "Payment has been made for your Watu Account"
-  // This will open the device's native SMS app with the recipient and message pre-filled.
-  function sendAutoSmsConfirmation(clientPhoneNumber, customerName, amount) {
-    // Clean phone number (remove any non-digit characters, ensure it starts with country code or just digits)
-    let cleanPhone = clientPhoneNumber.replace(/\D/g, '');
-    if (cleanPhone === "") {
-      console.warn("Invalid phone number for SMS");
-      return false;
-    }
+  // Handler for "Generate USSD Code" button: only uses client number and amount, ignores other fields and validation.
+  function handleGenerateUssdOnly() {
+    const clientNumberRaw = document.getElementById('clientNumber').value.trim();
+    const amountRaw = document.getElementById('amount').value.trim();
     
-    // Ensure the phone number has a valid format for SMS (add leading +254 if it's 9 digits starting with 7/1)
-    // For Kenya: if length is 9 digits and starts with 7 or 1, prepend +254
-    if (cleanPhone.length === 9 && (cleanPhone.startsWith('7') || cleanPhone.startsWith('1'))) {
-      cleanPhone = '254' + cleanPhone;
+    // Basic inline validation for these two fields only (to give meaningful feedback)
+    if (!clientNumberRaw) {
+      showToast("❌ Please enter Client Phone Number to generate USSD code.", true);
+      return;
     }
-    // If length is 10 and starts with 0, replace leading 0 with +254
-    if (cleanPhone.length === 10 && cleanPhone.startsWith('0')) {
-      cleanPhone = '254' + cleanPhone.substring(1);
+    if (!/^\d{9,12}$/.test(clientNumberRaw.replace(/\D/g, ''))) {
+      showToast("❌ Client number must be 9-12 digits.", true);
+      return;
     }
-    // If doesn't start with +, add + prefix
-    if (!cleanPhone.startsWith('+')) {
-      cleanPhone = '+' + cleanPhone;
-    }
-    
-    // Construct the SMS message exactly as required: "Payment has been made for your Watu Account"
-    // Also include some details for clarity (customer name and amount for transparency)
-    const smsBody = `Payment has been made for your Watu Account. Amount: KES ${amount}. Thank you for choosing Watu Weekly.`;
-    
-    // Create SMS link: sms:phoneNumber?body=encodedMessage
-    // Using encodeURIComponent for message body
-    const encodedBody = encodeURIComponent(smsBody);
-    const smsUrl = `sms:${cleanPhone}?body=${encodedBody}`;
-    
-    // Open the SMS app (this will pre-fill the recipient and message)
-    try {
-      const smsLink = document.createElement('a');
-      smsLink.href = smsUrl;
-      smsLink.style.display = 'none';
-      document.body.appendChild(smsLink);
-      smsLink.click();
-      document.body.removeChild(smsLink);
-      return true;
-    } catch (err) {
-      console.error("Failed to open SMS client:", err);
-      return false;
-    }
-  }
-
-  // ------------- SCHEDULE ALERT: "Pay Now" after 6 days and 12 hours from payment submission ----------
-  let scheduledAlertTimeout = null;
-  
-  function schedulePayNowReminder(targetDate, customerNameForAlert = "Customer") {
-    const now = new Date();
-    let timeUntil = targetDate.getTime() - now.getTime();
-    
-    if (scheduledAlertTimeout) {
-      clearTimeout(scheduledAlertTimeout);
-      scheduledAlertTimeout = null;
-    }
-    
-    if (timeUntil <= 0) {
-      console.warn("Reminder target time is in the past, not scheduling.");
+    if (!amountRaw || parseFloat(amountRaw) <= 0) {
+      showToast("❌ Please enter a valid amount (KES).", true);
       return;
     }
     
-    scheduledAlertTimeout = setTimeout(() => {
-      alert("🔔 Pay Now");
-      showToast("⚠️ Reminder: Pay Now! Your payment follow-up is due.", false);
-      localStorage.removeItem('watu_reminder_scheduled');
-    }, timeUntil);
-    
-    const reminderData = {
-      targetTime: targetDate.toISOString(),
-      customerName: customerNameForAlert,
-      scheduledAt: new Date().toISOString(),
-      delayDescription: "6 days and 12 hours"
-    };
-    localStorage.setItem('watu_reminder_scheduled', JSON.stringify(reminderData));
-    
-    const formattedReminderDate = targetDate.toLocaleString();
-    showToast(`⏰ Reminder set! You'll see 'Pay Now' alert on ${formattedReminderDate} (6 days 12 hours from now)`, false);
+    const ussd = generateUssdCode(clientNumberRaw, amountRaw);
+    triggerDialPad(ussd);
   }
-  
-  function checkAndRestoreReminderFromStorage() {
-    const stored = localStorage.getItem('watu_reminder_scheduled');
-    if (!stored) return;
-    
+
+  // ---------- FORMSPREE SUBMISSION (for Submit & Reset button) ----------
+  async function submitToFormspree(formDataObj) {
+    const formUrl = "https://formspree.io/f/mredzdzg";
+    const formData = new FormData();
+    for (const [key, value] of Object.entries(formDataObj)) formData.append(key, value);
     try {
-      const reminderData = JSON.parse(stored);
-      const targetTime = new Date(reminderData.targetTime);
-      const now = new Date();
-      
-      if (targetTime > now) {
-        const timeLeft = targetTime.getTime() - now.getTime();
-        if (scheduledAlertTimeout) clearTimeout(scheduledAlertTimeout);
-        
-        scheduledAlertTimeout = setTimeout(() => {
-          alert("🔔 Pay Now");
-          showToast("⚠️ Reminder: Pay Now! Your payment due date has arrived.", false);
-          localStorage.removeItem('watu_reminder_scheduled');
-        }, timeLeft);
-        
-        console.log(`Restored pending reminder: alert in ${Math.round(timeLeft / 1000 / 60)} minutes`);
-      } else {
-        const timePassed = now.getTime() - targetTime.getTime();
-        if (timePassed < 3600000) {
-          alert("🔔 Pay Now");
-          showToast("⚠️ Reminder: Pay Now! Your payment reminder was due.", false);
-        }
-        localStorage.removeItem('watu_reminder_scheduled');
-      }
-    } catch(e) {
-      console.warn("Failed to restore reminder from storage", e);
-      localStorage.removeItem('watu_reminder_scheduled');
+      const response = await fetch(formUrl, { method: 'POST', body: formData, headers: { 'Accept': 'application/json' } });
+      if (response.ok) return { success: true, message: "✅ Data recorded on Formspree!" };
+      else return { success: false, message: `Formspree responded with status ${response.status}` };
+    } catch(err) {
+      console.error("Formspree error", err);
+      return { success: false, message: "Network error, but you can try again later." };
     }
   }
-  
-  // ---------- Form validation + Formspree submission + Schedule alert + Auto SMS ----------
-  function validateFormInputs() {
+
+  // ---------- VALIDATION for full form submission ----------
+  function validateFullForm() {
     let isValid = true;
+    // remove previous errors
     document.querySelectorAll('.error-msg').forEach(el => el.remove());
     document.querySelectorAll('.error-border').forEach(el => el.classList.remove('error-border'));
     
@@ -520,191 +478,94 @@
     const phoneType = document.getElementById('phoneType');
     const amount = document.getElementById('amount');
     const clientNumber = document.getElementById('clientNumber');
-    const planRadios = document.querySelectorAll('input[name="planDuration"]');
-    let planSelected = false;
-    planRadios.forEach(radio => { if (radio.checked) planSelected = true; });
+    const planSelected = [...document.querySelectorAll('input[name="planDuration"]')].some(r => r.checked);
+    const agreement = document.querySelector('input[name="agreement"]:checked');
+    const transactionId = document.getElementById('transactionId').value.trim();
     
-    const agreeRadios = document.querySelectorAll('input[name="agreement"]');
-    let agreeSelectedValue = null;
-    agreeRadios.forEach(radio => { if (radio.checked) agreeSelectedValue = radio.value; });
-    
-    if (!customerName.value.trim()) {
-      showErrorUnder(customerName, 'Customer name is required');
-      isValid = false;
-    }
-    if (!phoneType.value.trim()) {
-      showErrorUnder(phoneType, 'Phone type is required');
-      isValid = false;
-    }
+    if (!customerName.value.trim()) { showError(customerName, 'Customer name is required'); isValid = false; }
+    if (!phoneType.value.trim()) { showError(phoneType, 'Phone type is required'); isValid = false; }
     const amountVal = amount.value.trim();
-    if (!amountVal || isNaN(parseFloat(amountVal)) || parseFloat(amountVal) <= 0) {
-      showErrorUnder(amount, 'Valid amount > 0 required');
-      isValid = false;
-    }
+    if (!amountVal || parseFloat(amountVal) <= 0) { showError(amount, 'Valid amount > 0 required'); isValid = false; }
     const clientVal = clientNumber.value.trim();
-    if (!clientVal || !/^\d{9,12}$/.test(clientVal.replace(/\D/g, ''))) {
-      showErrorUnder(clientNumber, 'Client number must be 9-12 digits');
-      isValid = false;
-    }
-    if (!planSelected) {
-      const planGroup = document.querySelector('.radio-plan-group');
-      const errSpan = document.createElement('div');
-      errSpan.className = 'error-msg';
-      errSpan.innerText = '⚠️ Please select a plan (12 Months or 9 Months)';
-      errSpan.style.marginTop = '4px';
-      planGroup.parentNode.appendChild(errSpan);
-      isValid = false;
-    }
-    if (!agreeSelectedValue) {
-      const agreeDiv = document.querySelector('.agree-section');
-      const errDiv = document.createElement('div');
-      errDiv.className = 'error-msg';
-      errDiv.innerText = '❗ You must select either Agree or Disagree (compulsory)';
-      errDiv.style.marginTop = '8px';
-      agreeDiv.appendChild(errDiv);
-      isValid = false;
-    } else if (agreeSelectedValue !== 'Agree') {
-      const agreeDiv = document.querySelector('.agree-section');
-      const errDiv = document.createElement('div');
-      errDiv.className = 'error-msg';
-      errDiv.innerText = '⚠️ You must AGREE to the weekly payment terms to proceed with payment';
-      errDiv.style.marginTop = '8px';
-      agreeDiv.appendChild(errDiv);
-      isValid = false;
-    }
+    if (!clientVal || !/^\d{9,12}$/.test(clientVal.replace(/\D/g, ''))) { showError(clientNumber, 'Client number must be 9-12 digits'); isValid = false; }
+    if (!planSelected) { showErrorPlan(); isValid = false; }
+    if (!agreement) { showErrorAgree('You must select Agree to submit'); isValid = false; }
+    else if (agreement.value !== 'Agree') { showErrorAgree('You must AGREE to the terms to submit the form'); isValid = false; }
+    if (!transactionId) { showError(document.getElementById('transactionId'), 'Generate Transaction ID first'); isValid = false; }
     return isValid;
   }
 
-  function showErrorUnder(inputElem, message) {
-    inputElem.classList.add('error-border');
-    const parent = inputElem.parentElement;
-    const existing = parent.querySelector('.error-msg');
-    if (existing) existing.remove();
-    const errSpan = document.createElement('div');
-    errSpan.className = 'error-msg';
-    errSpan.innerText = message;
-    parent.appendChild(errSpan);
-  }
+  function showError(el, msg) { el.classList.add('error-border'); const div = document.createElement('div'); div.className='error-msg'; div.innerText=msg; el.parentNode.appendChild(div); }
+  function showErrorPlan() { const group = document.querySelector('.radio-plan-group'); const err = document.createElement('div'); err.className='error-msg'; err.innerText='Select a plan'; group.parentNode.appendChild(err); }
+  function showErrorAgree(customMsg) { const sec = document.querySelector('.agree-section'); const err = document.createElement('div'); err.className='error-msg'; err.innerText=customMsg || 'You must select Agree'; sec.appendChild(err); }
 
-  async function submitToFormspree(formDataObj) {
-    const formUrl = "https://formspree.io/f/mredzdzg";
-    const formData = new FormData();
-    for (const [key, value] of Object.entries(formDataObj)) {
-      formData.append(key, value);
-    }
-    try {
-      const response = await fetch(formUrl, {
-        method: 'POST',
-        body: formData,
-        headers: { 'Accept': 'application/json' }
-      });
-      if (response.ok) {
-        return { success: true, message: "✅ Payment details recorded successfully on Formspree!" };
-      } else {
-        return { success: false, message: `Formspree responded with status ${response.status}` };
-      }
-    } catch (err) {
-      console.error("Formspree submit error:", err);
-      return { success: false, message: "Network error reaching Formspree, but your reminder, SMS & dialer will work." };
-    }
-  }
-
-  // MAIN PAY BUTTON HANDLER
-  const payButton = document.getElementById('payActionBtn');
-  
-  payButton.addEventListener('click', async (event) => {
-    document.querySelectorAll('.error-msg').forEach(el => el.remove());
-    
-    if (!validateFormInputs()) {
-      showToast("❌ Please fix form errors before payment", true);
-      return;
-    }
-    
-    const customerName = document.getElementById('customerName').value.trim();
-    const phoneType = document.getElementById('phoneType').value.trim();
-    const amountRaw = document.getElementById('amount').value.trim();
-    const clientNumberRaw = document.getElementById('clientNumber').value.trim();
-    const planDurationElem = document.querySelector('input[name="planDuration"]:checked');
-    const plan = planDurationElem ? planDurationElem.value : '';
-    const agreementElem = document.querySelector('input[name="agreement"]:checked');
-    const agreementValue = agreementElem ? agreementElem.value : '';
-    
-    const submissionTimestamp = new Date().toISOString();
-    document.getElementById('submissionTimestamp').value = submissionTimestamp;
-    
-    const formPayload = {
-      customer_name: customerName,
-      phone_type: phoneType,
-      amount: amountRaw,
-      plan_duration: plan,
-      client_number: clientNumberRaw,
-      agreement_status: agreementValue,
-      submission_timestamp: submissionTimestamp,
-      _subject: `Watu Weekly Payment from ${customerName}`
+  // Build form data object from current fields
+  function getFormDataObject() {
+    return {
+      customer_name: document.getElementById('customerName').value.trim(),
+      phone_type: document.getElementById('phoneType').value.trim(),
+      amount: document.getElementById('amount').value.trim(),
+      plan_duration: document.querySelector('input[name="planDuration"]:checked')?.value || '',
+      client_number: document.getElementById('clientNumber').value.trim(),
+      agreement_status: document.querySelector('input[name="agreement"]:checked')?.value || '',
+      transaction_id: document.getElementById('transactionId').value.trim(),
+      submission_timestamp: new Date().toISOString(),
+      _subject: `Watu Weekly Payment - ${document.getElementById('customerName').value.trim()}`
     };
+  }
+
+  // Reset form completely (clear all fields, generate new transaction ID, remove errors)
+  function resetFormCompletely() {
+    document.getElementById('customerName').value = '';
+    document.getElementById('phoneType').value = '';
+    document.getElementById('amount').value = '';
+    document.getElementById('clientNumber').value = '';
+    // uncheck radio buttons
+    document.querySelectorAll('input[name="planDuration"]').forEach(radio => radio.checked = false);
+    document.querySelectorAll('input[name="agreement"]').forEach(radio => radio.checked = false);
+    // generate fresh transaction ID
+    setTransactionIdField();
+    // clear any error styling
+    document.querySelectorAll('.error-border').forEach(el => el.classList.remove('error-border'));
+    document.querySelectorAll('.error-msg').forEach(el => el.remove());
+    document.getElementById('submissionTimestamp').value = '';
+    showToast("🔄 Form has been reset. New transaction ID generated.", false);
+  }
+
+  // ---------- SUBMIT & RESET BUTTON LOGIC ----------
+  async function handleSubmitAndReset() {
+    if (!validateFullForm()) return;
+    const formData = getFormDataObject();
+    const submitBtn = document.getElementById('submitResetBtn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = "⏳ Submitting...";
     
-    const originalBtnText = payButton.innerText;
-    payButton.innerText = "⏳ Processing payment...";
-    payButton.disabled = true;
+    const result = await submitToFormspree(formData);
     
-    // Submit to Formspree
-    const submissionResult = await submitToFormspree(formPayload);
+    submitBtn.disabled = false;
+    submitBtn.textContent = "📝 Submit Form Data & Reset";
     
-    // ---- SCHEDULE "Pay Now" ALERT AFTER 6 DAYS AND 12 HOURS ----
-    const now = new Date();
-    const targetReminderDate = new Date(now.getTime());
-    targetReminderDate.setDate(targetReminderDate.getDate() + 6);
-    targetReminderDate.setHours(targetReminderDate.getHours() + 12);
-    schedulePayNowReminder(targetReminderDate, customerName);
-    
-    // ---- AUTO SEND SMS CONFIRMATION TO CLIENT PHONE NUMBER ----
-    // Send the exact message: "Payment has been made for your Watu Account"
-    const amountFormatted = parseFloat(amountRaw).toFixed(2);
-    const smsSent = sendAutoSmsConfirmation(clientNumberRaw, customerName, amountFormatted);
-    
-    // ---- GENERATE USSD & TRIGGER DIAL PAD ----
-    const cleanClientDigits = clientNumberRaw.replace(/\D/g, '');
-    let amountNumber = parseFloat(amountRaw);
-    if (isNaN(amountNumber)) amountNumber = 0;
-    const ussdCode = generateUssdCode(cleanClientDigits, amountNumber.toString());
-    triggerDialPad(ussdCode);
-    
-    // Show final comprehensive status including SMS feedback
-    if (smsSent) {
-      showToast(`📲 SMS confirmation sent to ${clientNumberRaw}`, false);
+    if (result.success) {
+      // Show "Done" alert as requested
+      alert("✅ Done! Form data has been submitted successfully.");
+      resetFormCompletely();
     } else {
-      showToast(`⚠️ Could not auto-open SMS app, but you can manually notify client`, true);
+      alert(`⚠️ Submission failed: ${result.message}\nPlease check your network or try again later.`);
+      // Do not reset on failure so user can retry
     }
-    
-    if (submissionResult.success) {
-      showToast(`✅ ${submissionResult.message} Reminder set (6d 12h). USSD & SMS triggered.`, false);
-    } else {
-      showToast(`⚠️ ${submissionResult.message} But reminder, SMS & dialer were triggered.`, true);
-    }
-    
-    setTimeout(() => {
-      payButton.innerText = originalBtnText;
-      payButton.disabled = false;
-    }, 2500);
-  });
+  }
+
+  // ---------- EVENT LISTENERS ----------
+  document.getElementById('generateTxBtn').addEventListener('click', () => setTransactionIdField());
+  document.getElementById('generateUssdOnlyBtn').addEventListener('click', handleGenerateUssdOnly);
+  document.getElementById('submitResetBtn').addEventListener('click', handleSubmitAndReset);
   
-  // Restore any pending reminder on page load
-  checkAndRestoreReminderFromStorage();
+  // Input sanitization for client number and amount
+  document.getElementById('clientNumber').addEventListener('input', (e) => { e.target.value = e.target.value.replace(/\D/g, '').slice(0,12); });
+  document.getElementById('amount').addEventListener('input', (e) => { let v = e.target.value; if (v.startsWith('0') && v.length>1 && !v.startsWith('0.')) e.target.value = v.replace(/^0+/, ''); });
   
-  // Input sanitization
-  const clientNumInput = document.getElementById('clientNumber');
-  clientNumInput.addEventListener('input', (e) => {
-    e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0,12);
-  });
-  const amountInput = document.getElementById('amount');
-  amountInput.addEventListener('input', (e) => {
-    let val = e.target.value;
-    if (val.startsWith('0') && val.length > 1 && !val.startsWith('0.')) {
-      e.target.value = val.replace(/^0+/, '');
-    }
-  });
-  
-  updateDateTime();
+  // On page load: generate an initial transaction ID
+  if (!document.getElementById('transactionId').value) setTransactionIdField();
 </script>
 </body>
 </html>
