@@ -1,571 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-  <title>Watu Weekly · USSD & Form Submit Separated</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-    }
+<title>Page Title</title>
+<meta charset="UTF-8">
 
-    body {
-      background: linear-gradient(145deg, #e0eafc 0%, #cfdef3 100%);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 1.5rem;
-    }
+<style>
+@font-face { 
+  font-family: "Merriweather Sans";
+  src: url('MerriweatherSans-Medium.ttf') format('truetype');
+}
 
-    .card {
-      max-width: 720px;
-      width: 100%;
-      background: rgba(255, 255, 255, 0.97);
-      border-radius: 2rem;
-      box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.35), 0 8px 18px rgba(0, 0, 0, 0.05);
-      overflow: hidden;
-    }
+body {
+  background: #FFFFFF;
+  margin-bottom: 200px;
+}
 
-    .header {
-      background: #0f2b3d;
-      padding: 1.4rem 1.8rem;
-      color: white;
-      border-bottom: 4px solid #f5b042;
-    }
+@keyframes BackgroundGradient {
+  0%{background-position:0% 50%;}
+  50%{background-position: 100% 50% }
+  100%{background-position: 0% 50%}
 
-    .brand {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
+}
 
-    .brand h1 {
-      font-weight: 700;
-      font-size: 1.8rem;
-      background: linear-gradient(135deg, #FFE6B0, #FFB347);
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
-    }
+.VCE{
+  color: #f2f2f2;
+  background: linear-gradient(45deg, #FCE38A, #f5ad4d, #fd81b5, #f74689, #ad5af3, #8a13ef );
+  background-size: 450% 100%;
+  animation: BackgroundGradient 30s ease infinite;  
+  padding: 20px;
+  margin: 30px;
+  border-radius: 0.5rem;
+}
 
-    .datetime-box {
-      background: #1e3a4d;
-      padding: 0.4rem 1rem;
-      border-radius: 40px;
-      font-size: 0.9rem;
-      font-weight: 500;
-      font-family: monospace;
-    }
+.VCE_Title{
+  font-family: "Merriweather Sans", sans-serif;
+  font-weight: 400;
+  font-size: 30px;
+  margin-bottom: 0;
+}
 
-    .sub {
-      font-size: 0.85rem;
-      opacity: 0.8;
-      margin-top: 6px;
-    }
+.JTime{
+  font-family: "Merriweather Sans", sans-serif;
+  font-size: 20px;
+}
 
-    .form-container {
-      padding: 1.8rem 2rem 2rem 2rem;
-    }
+button {
+  font-family: "Merriweather Sans", sans-serif;
+  font-size: 16px;
+  padding: 15px 22px;
+  border:3px #f2f2f2 solid;
+  border-radius:20px;
+  word-break: break-word;
+  white-space: normal;  
+}
 
-    .input-group {
-      margin-bottom: 1.3rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    label {
-      font-weight: 600;
-      color: #1f3e48;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    input, select {
-      padding: 0.85rem 1rem;
-      border-radius: 18px;
-      border: 1.5px solid #e2e8f0;
-      background: #fefefe;
-      font-size: 1rem;
-      transition: all 0.2s;
-      outline: none;
-    }
-
-    input:focus, select:focus {
-      border-color: #f5b042;
-      box-shadow: 0 0 0 3px rgba(245, 176, 66, 0.2);
-    }
-
-    input[readonly] {
-      background: #f5f9fe;
-      cursor: default;
-      border-color: #cddfe7;
-    }
-
-    .radio-plan-group {
-      display: flex;
-      gap: 2rem;
-      background: #f8fafc;
-      padding: 0.8rem 1.2rem;
-      border-radius: 60px;
-      border: 1px solid #e2edf2;
-    }
-
-    .radio-plan-group label {
-      font-weight: 500;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      cursor: pointer;
-    }
-
-    hr {
-      margin: 0.5rem 0 1.2rem;
-      border: 0;
-      height: 2px;
-      background: linear-gradient(90deg, #f5b04220, #f5b042, #f5b04220);
-    }
-
-    .agree-section {
-      background: #fef7e6;
-      border-radius: 1.2rem;
-      padding: 1rem 1.5rem;
-      margin: 1.2rem 0 1.2rem;
-      border-left: 6px solid #f5b042;
-    }
-
-    .agree-title {
-      font-weight: 700;
-      margin-bottom: 0.8rem;
-      font-size: 0.9rem;
-      color: #2c4b34;
-    }
-
-    .agree-options {
-      display: flex;
-      gap: 2rem;
-      flex-wrap: wrap;
-    }
-
-    .agree-options label {
-      font-weight: 500;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-    }
-
-    input[type="radio"] {
-      transform: scale(1.1);
-      accent-color: #f5a623;
-      width: 18px;
-      height: 18px;
-    }
-
-    .gen-row {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .gen-row input {
-      flex: 3;
-    }
-
-    .gen-btn, .ussd-btn {
-      background: #2c5a6e;
-      border: none;
-      padding: 0.75rem 1.2rem;
-      border-radius: 2rem;
-      color: white;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 0.85rem;
-      transition: 0.2s;
-      white-space: nowrap;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-
-    .gen-btn:hover, .ussd-btn:hover {
-      background: #1f4658;
-      transform: translateY(-1px);
-    }
-
-    .button-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin-top: 0.5rem;
-    }
-
-    .ussd-action-btn {
-      background: linear-gradient(95deg, #0f4c6b, #1a6d97);
-      color: white;
-      font-weight: 700;
-      font-size: 1.1rem;
-      padding: 0.9rem 1.2rem;
-      flex: 1;
-      border: none;
-      border-radius: 50px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 10px rgba(0, 32, 64, 0.2);
-    }
-
-    .submit-reset-btn {
-      background: linear-gradient(95deg, #3c7a5a, #2b6a4a);
-      color: white;
-      font-weight: 700;
-      font-size: 1.1rem;
-      padding: 0.9rem 1.2rem;
-      flex: 1;
-      border: none;
-      border-radius: 50px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 10px rgba(0, 64, 32, 0.2);
-    }
-
-    .ussd-action-btn:hover, .submit-reset-btn:hover {
-      transform: translateY(-2px);
-      filter: brightness(1.02);
-    }
-
-    .toast-msg {
-      position: fixed;
-      bottom: 25px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #1e2f3b;
-      color: #ffecb3;
-      padding: 12px 24px;
-      border-radius: 60px;
-      font-weight: 500;
-      z-index: 1000;
-      font-size: 0.9rem;
-      pointer-events: none;
-      transition: opacity 0.2s;
-    }
-
-    .error-msg {
-      color: #d14545;
-      font-size: 0.75rem;
-      margin-top: 0.3rem;
-    }
-
-    input.error-border {
-      border-color: #e03a3a;
-      background: #fff8f8;
-    }
-
-    .info-badge {
-      margin-top: 1rem;
-      background: #eef2ff;
-      border-radius: 30px;
-      padding: 0.6rem 1rem;
-      font-size: 0.73rem;
-      text-align: center;
-      color: #1f6392;
-      font-weight: 500;
-    }
-
-    @media (max-width: 600px) {
-      .form-container { padding: 1.2rem; }
-      .gen-row { flex-direction: column; align-items: stretch; }
-      .button-group { flex-direction: column; }
-    }
-  </style>
+</style>
 </head>
 <body>
-
-<div class="card">
-  <div class="header">
-    <div class="brand">
-      <h1>📱 WATU WEEKLY</h1>
-      <div class="datetime-box" id="liveDateTime">— : —</div>
-    </div>
-    <div class="sub">✅ USSD Generator + Separate Form Submission</div>
-  </div>
-
-  <div class="form-container">
-    <form id="paymentForm">
-      <!-- Customer Name -->
-      <div class="input-group">
-        <label>👤 Customer Full Name</label>
-        <input type="text" id="customerName" name="customer_name" placeholder="e.g., James Otieno" required>
-      </div>
-
-      <!-- Phone type -->
-      <div class="input-group">
-        <label>📱 Phone Type / Model</label>
-        <input type="text" id="phoneType" name="phone_type" placeholder="e.g., Samsung A15, Tecno Spark" required>
-      </div>
-
-      <!-- Amount -->
-      <div class="input-group">
-        <label>💰 Amount (KES)</label>
-        <input type="number" id="amount" name="amount" placeholder="e.g., 2500" step="0.01" required>
-      </div>
-
-      <!-- Plan Radio Buttons -->
-      <div class="input-group">
-        <label>📆 Installment Plan</label>
-        <div class="radio-plan-group">
-          <label><input type="radio" name="planDuration" value="12 Months Plan" required> 12 Months Plan</label>
-          <label><input type="radio" name="planDuration" value="9 Months Plan"> 9 Months Plan</label>
-        </div>
-      </div>
-
-      <!-- Client Number (for USSD) -->
-      <div class="input-group">
-        <label>📞 Client Phone Number (for USSD code)</label>
-        <input type="tel" id="clientNumber" name="client_number" placeholder="e.g., 712345678" required pattern="[0-9]{9,12}">
-        <small>Used to replace XXXXXXXXX in USSD code: #144*3*4*2*2*XXXXXXXXX*amount*1*pin#</small>
-      </div>
-
-      <!-- TRANSACTION ID GENERATOR (kept for record but submit button will use it) -->
-      <div class="input-group">
-        <label>🔖 Transaction ID (Auto-Generated)</label>
-        <div class="gen-row">
-          <input type="text" id="transactionId" name="transaction_id" readonly placeholder="Click generate to create ID" style="background:#fefcf5;">
-          <button type="button" id="generateTxBtn" class="gen-btn">🔄 Generate ID</button>
-        </div>
-        <small>Format: NW1234567.12345.M1234567</small>
-      </div>
-
-      <hr>
-
-      <!-- Compulsory Agree/Disagree -->
-      <div class="agree-section">
-        <div class="agree-title">📜 Terms & Consent (compulsory for submission)</div>
-        <div class="agree-options">
-          <label><input type="radio" name="agreement" value="Agree" required> ✅ I Agree to weekly payment terms</label>
-          <label><input type="radio" name="agreement" value="Disagree"> ❌ I Disagree</label>
-        </div>
-        <small>You must select Agree to submit the form.</small>
-      </div>
-
-      <input type="hidden" id="submissionTimestamp" name="submission_timestamp" value="">
-      
-      <!-- TWO BUTTONS: Generate USSD only + Submit & Reset -->
-      <div class="button-group">
-        <button type="button" id="generateUssdOnlyBtn" class="ussd-action-btn">📞 Generate USSD Code (Dial Pad)</button>
-        <button type="button" id="submitResetBtn" class="submit-reset-btn">📝 Submit Form Data & Reset</button>
-      </div>
-      
-      <div class="info-badge">
-        🔹 <strong>Generate USSD Code</strong> – only creates the USSD string and opens your phone dialer. No data is saved.<br>
-        🔹 <strong>Submit Form Data & Reset</strong> – validates all fields, sends data to Formspree, shows "Done" alert, then clears the form.
-      </div>
-    </form>
-  </div>
+<div class="VCE">
+<h2 class="VCE_Title">Visual Code Editor for HTML, CSS and JavaScript</h2>
+<hr style="border: 3px solid #f2f2f2;">
+<p class="JTime">Whatever code you write above, Live Preview will be visible here</p>
+<br>
+<button type="button" onclick="document.getElementById('Example').innerHTML = Date()">a Javascript Date and Time</button>
+<p class="JTime" id="Example"></p>
+<p class="JTime">Hit the "Clear" button and start typing Code.</p>
 </div>
-
-<div id="toastMessage" class="toast-msg" style="opacity:0; visibility: hidden;"></div>
-
-<script>
-  // ------------------- LIVE DATE & TIME ------------------
-  function updateDateTime() {
-    const now = new Date();
-    const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
-    document.getElementById('liveDateTime').innerText = now.toLocaleDateString('en-KE', options);
-  }
-  updateDateTime();
-  setInterval(updateDateTime, 1000);
-
-  function showToast(message, isError = false) {
-    const toast = document.getElementById('toastMessage');
-    toast.innerText = message;
-    toast.style.visibility = 'visible';
-    toast.style.opacity = '1';
-    toast.style.backgroundColor = isError ? '#9e2d2d' : '#1f3e48';
-    setTimeout(() => {
-      toast.style.opacity = '0';
-      setTimeout(() => toast.style.visibility = 'hidden', 300);
-    }, 4000);
-  }
-
-  // ---------- TRANSACTION ID GENERATOR ----------
-  function generateTransactionId() {
-    const rand7_1 = Math.floor(1000000 + Math.random() * 9000000).toString();
-    const rand5 = Math.floor(10000 + Math.random() * 90000).toString();
-    const rand7_2 = Math.floor(1000000 + Math.random() * 9000000).toString();
-    return `NW${rand7_1}.${rand5}.M${rand7_2}`;
-  }
-
-  function setTransactionIdField() {
-    const newId = generateTransactionId();
-    document.getElementById('transactionId').value = newId;
-    showToast(`🆔 New Transaction ID: ${newId}`, false);
-    return newId;
-  }
-
-  // ---------- USSD GENERATOR (ONLY dialer, no data submission) ----------
-  function generateUssdCode(clientNumberRaw, amountRaw) {
-    let cleanClient = clientNumberRaw.replace(/\D/g, '');
-    if (cleanClient === "") cleanClient = "000000000";
-    let amountInteger = Math.floor(parseFloat(amountRaw) || 0);
-    const pin = "1234";
-    return `#144*3*4*2*2*${cleanClient}*${amountInteger}*1*${pin}#`;
-  }
-
-  function triggerDialPad(ussdCode) {
-    const telUrl = "tel:" + ussdCode.replace(/#/g, '%23');
-    const link = document.createElement('a');
-    link.href = telUrl;
-    link.style.display = 'none';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    showToast(`📞 USSD Code: ${ussdCode} – Dialer opened`, false);
-  }
-
-  // Handler for "Generate USSD Code" button: only uses client number and amount, ignores other fields and validation.
-  function handleGenerateUssdOnly() {
-    const clientNumberRaw = document.getElementById('clientNumber').value.trim();
-    const amountRaw = document.getElementById('amount').value.trim();
-    
-    // Basic inline validation for these two fields only (to give meaningful feedback)
-    if (!clientNumberRaw) {
-      showToast("❌ Please enter Client Phone Number to generate USSD code.", true);
-      return;
-    }
-    if (!/^\d{9,12}$/.test(clientNumberRaw.replace(/\D/g, ''))) {
-      showToast("❌ Client number must be 9-12 digits.", true);
-      return;
-    }
-    if (!amountRaw || parseFloat(amountRaw) <= 0) {
-      showToast("❌ Please enter a valid amount (KES).", true);
-      return;
-    }
-    
-    const ussd = generateUssdCode(clientNumberRaw, amountRaw);
-    triggerDialPad(ussd);
-  }
-
-  // ---------- FORMSPREE SUBMISSION (for Submit & Reset button) ----------
-  async function submitToFormspree(formDataObj) {
-    const formUrl = "https://formspree.io/f/mredzdzg";
-    const formData = new FormData();
-    for (const [key, value] of Object.entries(formDataObj)) formData.append(key, value);
-    try {
-      const response = await fetch(formUrl, { method: 'POST', body: formData, headers: { 'Accept': 'application/json' } });
-      if (response.ok) return { success: true, message: "✅ Data recorded on Formspree!" };
-      else return { success: false, message: `Formspree responded with status ${response.status}` };
-    } catch(err) {
-      console.error("Formspree error", err);
-      return { success: false, message: "Network error, but you can try again later." };
-    }
-  }
-
-  // ---------- VALIDATION for full form submission ----------
-  function validateFullForm() {
-    let isValid = true;
-    // remove previous errors
-    document.querySelectorAll('.error-msg').forEach(el => el.remove());
-    document.querySelectorAll('.error-border').forEach(el => el.classList.remove('error-border'));
-    
-    const customerName = document.getElementById('customerName');
-    const phoneType = document.getElementById('phoneType');
-    const amount = document.getElementById('amount');
-    const clientNumber = document.getElementById('clientNumber');
-    const planSelected = [...document.querySelectorAll('input[name="planDuration"]')].some(r => r.checked);
-    const agreement = document.querySelector('input[name="agreement"]:checked');
-    const transactionId = document.getElementById('transactionId').value.trim();
-    
-    if (!customerName.value.trim()) { showError(customerName, 'Customer name is required'); isValid = false; }
-    if (!phoneType.value.trim()) { showError(phoneType, 'Phone type is required'); isValid = false; }
-    const amountVal = amount.value.trim();
-    if (!amountVal || parseFloat(amountVal) <= 0) { showError(amount, 'Valid amount > 0 required'); isValid = false; }
-    const clientVal = clientNumber.value.trim();
-    if (!clientVal || !/^\d{9,12}$/.test(clientVal.replace(/\D/g, ''))) { showError(clientNumber, 'Client number must be 9-12 digits'); isValid = false; }
-    if (!planSelected) { showErrorPlan(); isValid = false; }
-    if (!agreement) { showErrorAgree('You must select Agree to submit'); isValid = false; }
-    else if (agreement.value !== 'Agree') { showErrorAgree('You must AGREE to the terms to submit the form'); isValid = false; }
-    if (!transactionId) { showError(document.getElementById('transactionId'), 'Generate Transaction ID first'); isValid = false; }
-    return isValid;
-  }
-
-  function showError(el, msg) { el.classList.add('error-border'); const div = document.createElement('div'); div.className='error-msg'; div.innerText=msg; el.parentNode.appendChild(div); }
-  function showErrorPlan() { const group = document.querySelector('.radio-plan-group'); const err = document.createElement('div'); err.className='error-msg'; err.innerText='Select a plan'; group.parentNode.appendChild(err); }
-  function showErrorAgree(customMsg) { const sec = document.querySelector('.agree-section'); const err = document.createElement('div'); err.className='error-msg'; err.innerText=customMsg || 'You must select Agree'; sec.appendChild(err); }
-
-  // Build form data object from current fields
-  function getFormDataObject() {
-    return {
-      customer_name: document.getElementById('customerName').value.trim(),
-      phone_type: document.getElementById('phoneType').value.trim(),
-      amount: document.getElementById('amount').value.trim(),
-      plan_duration: document.querySelector('input[name="planDuration"]:checked')?.value || '',
-      client_number: document.getElementById('clientNumber').value.trim(),
-      agreement_status: document.querySelector('input[name="agreement"]:checked')?.value || '',
-      transaction_id: document.getElementById('transactionId').value.trim(),
-      submission_timestamp: new Date().toISOString(),
-      _subject: `Watu Weekly Payment - ${document.getElementById('customerName').value.trim()}`
-    };
-  }
-
-  // Reset form completely (clear all fields, generate new transaction ID, remove errors)
-  function resetFormCompletely() {
-    document.getElementById('customerName').value = '';
-    document.getElementById('phoneType').value = '';
-    document.getElementById('amount').value = '';
-    document.getElementById('clientNumber').value = '';
-    // uncheck radio buttons
-    document.querySelectorAll('input[name="planDuration"]').forEach(radio => radio.checked = false);
-    document.querySelectorAll('input[name="agreement"]').forEach(radio => radio.checked = false);
-    // generate fresh transaction ID
-    setTransactionIdField();
-    // clear any error styling
-    document.querySelectorAll('.error-border').forEach(el => el.classList.remove('error-border'));
-    document.querySelectorAll('.error-msg').forEach(el => el.remove());
-    document.getElementById('submissionTimestamp').value = '';
-    showToast("🔄 Form has been reset. New transaction ID generated.", false);
-  }
-
-  // ---------- SUBMIT & RESET BUTTON LOGIC ----------
-  async function handleSubmitAndReset() {
-    if (!validateFullForm()) return;
-    const formData = getFormDataObject();
-    const submitBtn = document.getElementById('submitResetBtn');
-    submitBtn.disabled = true;
-    submitBtn.textContent = "⏳ Submitting...";
-    
-    const result = await submitToFormspree(formData);
-    
-    submitBtn.disabled = false;
-    submitBtn.textContent = "📝 Submit Form Data & Reset";
-    
-    if (result.success) {
-      // Show "Done" alert as requested
-      alert("✅ Done! Form data has been submitted successfully.");
-      resetFormCompletely();
-    } else {
-      alert(`⚠️ Submission failed: ${result.message}\nPlease check your network or try again later.`);
-      // Do not reset on failure so user can retry
-    }
-  }
-
-  // ---------- EVENT LISTENERS ----------
-  document.getElementById('generateTxBtn').addEventListener('click', () => setTransactionIdField());
-  document.getElementById('generateUssdOnlyBtn').addEventListener('click', handleGenerateUssdOnly);
-  document.getElementById('submitResetBtn').addEventListener('click', handleSubmitAndReset);
-  
-  // Input sanitization for client number and amount
-  document.getElementById('clientNumber').addEventListener('input', (e) => { e.target.value = e.target.value.replace(/\D/g, '').slice(0,12); });
-  document.getElementById('amount').addEventListener('input', (e) => { let v = e.target.value; if (v.startsWith('0') && v.length>1 && !v.startsWith('0.')) e.target.value = v.replace(/^0+/, ''); });
-  
-  // On page load: generate an initial transaction ID
-  if (!document.getElementById('transactionId').value) setTransactionIdField();
-</script>
 </body>
 </html>
