@@ -240,47 +240,39 @@
       filter: brightness(1.02);
     }
 
-    /* ----- New footer links section ----- */
-    .contact-bar {
+    /* ----- Small icon button bar (replaces previous contact bar) ----- */
+    .icon-button-bar {
       margin-top: 1.5rem;
-      background: #f1f5f9;
-      border-radius: 1.5rem;
-      padding: 1rem 1.2rem;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 1rem;
-      border: 1px solid #e0eef5;
+      gap: 0.7rem;
     }
 
-    .contact-link {
-      background: white;
-      padding: 0.5rem 1.2rem;
-      border-radius: 40px;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 0.85rem;
+    .small-icon-btn {
+      background: #f1f5f9;
+      border: 1px solid #cddfe7;
+      border-radius: 2rem;
+      padding: 0.5rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 500;
       color: #1f3e48;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-      transition: all 0.2s;
+      cursor: pointer;
+      transition: all 0.2s ease;
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
-      border: 1px solid #cddfe7;
-      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     }
 
-    .contact-link:hover {
+    .small-icon-btn:hover {
       background: #fef7e6;
       border-color: #f5b042;
       transform: translateY(-2px);
     }
 
-    .popup-link {
-      background: #e9edf2;
-    }
-
-    /* Modal overlay */
+    /* Modal styles (unchanged) */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -402,7 +394,8 @@
       .form-container { padding: 1.2rem; }
       .gen-row { flex-direction: column; align-items: stretch; }
       .button-group { flex-direction: column; }
-      .contact-bar { flex-direction: column; align-items: stretch; text-align: center; }
+      .icon-button-bar { gap: 0.5rem; }
+      .small-icon-btn { font-size: 0.7rem; padding: 0.4rem 0.8rem; }
     }
   </style>
 </head>
@@ -481,17 +474,17 @@
         <button type="button" id="submitResetBtn" class="submit-reset-btn">📝 Submit Form Data & Reset</button>
       </div>
       
-      <!-- REPLACED BOTTOM SECTION with contact links & popup modals -->
-      <div class="contact-bar">
-        <!-- WhatsApp link: opens chat with pre-filled invite message (popup/new tab) -->
-        <a href="https://wa.me/23276436811?text=Hello%21%20I%20need%20assistance%20with%20Watu%20Weekly%20payment" target="_blank" class="contact-link">💬 WhatsApp +23276436811</a>
-        <!-- Dial pad links -->
-        <a href="tel:+23280422698" class="contact-link">📞 Call +23280422698</a>
-        <a href="tel:+23273671566" class="contact-link">📞 Call +23273671566</a>
-        <!-- Popup: developer info -->
-        <button class="contact-link popup-link" id="developerPopupBtn">👨‍💻 About Developer</button>
-        <!-- Popup: social media platforms -->
-        <button class="contact-link popup-link" id="socialPopupBtn">🌐 Social Media</button>
+      <!-- NEW: Small icon buttons instead of text links -->
+      <div class="icon-button-bar">
+        <!-- WhatsApp button: opens chat with pre-filled invite -->
+        <a href="https://wa.me/23276436811?text=Hello%21%20I%20need%20assistance%20with%20Watu%20Weekly%20payment" target="_blank" class="small-icon-btn">💬 WhatsApp</a>
+        <!-- Dial pad buttons -->
+        <a href="tel:+23280422698" class="small-icon-btn">📞 +23280422698</a>
+        <a href="tel:+23273671566" class="small-icon-btn">📞 +23273671566</a>
+        <!-- Developer info popup button -->
+        <button type="button" id="developerPopupBtn" class="small-icon-btn">👨‍💻 Developer</button>
+        <!-- Social media popup button -->
+        <button type="button" id="socialPopupBtn" class="small-icon-btn">🌐 Social</button>
       </div>
     </form>
   </div>
@@ -722,7 +715,6 @@
     const modal = document.getElementById(modalId);
     if (modal) modal.classList.remove('active');
   }
-  // Close modals when clicking overlay background
   document.querySelectorAll('.modal-overlay').forEach(overlay => {
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) overlay.classList.remove('active');
