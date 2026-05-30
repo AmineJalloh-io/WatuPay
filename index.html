@@ -332,14 +332,14 @@
         <!-- No helper text below this field as requested -->
       </div>
 
-      <!-- TRANSACTION ID GENERATOR -->
+      <!-- TRANSACTION ID GENERATOR: initially empty; only filled on button click. Format hint removed. -->
       <div class="input-group">
-        <label>🔖 Transaction ID (Auto-Generated)</label>
+        <label>🔖 Transaction ID (click Generate to create)</label>
         <div class="gen-row">
-          <input type="text" id="transactionId" name="transaction_id" readonly placeholder="Click generate to create ID" style="background:#fefcf5;">
+          <input type="text" id="transactionId" name="transaction_id" readonly placeholder="No ID yet — click Generate" style="background:#fefcf5;">
           <button type="button" id="generateTxBtn" class="gen-btn">🔄 Generate ID</button>
         </div>
-        <small>Format: NW1234567.12345.M1234567</small>
+        <!-- The format sample text has been removed as requested -->
       </div>
 
       <hr>
@@ -404,9 +404,15 @@
 
   function setTransactionIdField() {
     const newId = generateTransactionId();
-    document.getElementById('transactionId').value = newId;
+    const txField = document.getElementById('transactionId');
+    txField.value = newId;
     showToast(`🆔 New Transaction ID: ${newId}`, false);
     return newId;
+  }
+
+  // Clear transaction ID (used on reset)
+  function clearTransactionIdField() {
+    document.getElementById('transactionId').value = '';
   }
 
   // ---------- USSD GENERATOR (ONLY dialer) ----------
@@ -488,7 +494,7 @@
     if (!planSelected) { showErrorPlan(); isValid = false; }
     if (!agreement) { showErrorAgree('You must select Agree to submit'); isValid = false; }
     else if (agreement.value !== 'Agree') { showErrorAgree('You must AGREE to the terms to submit the form'); isValid = false; }
-    if (!transactionId) { showError(document.getElementById('transactionId'), 'Generate Transaction ID first'); isValid = false; }
+    if (!transactionId) { showError(document.getElementById('transactionId'), 'Please generate a Transaction ID first'); isValid = false; }
     return isValid;
   }
 
@@ -510,18 +516,22 @@
     };
   }
 
+  // Reset form: clear all fields, transaction ID becomes empty (must be regenerated manually)
   function resetFormCompletely() {
     document.getElementById('customerName').value = '';
     document.getElementById('phoneType').value = '';
     document.getElementById('amount').value = '';
     document.getElementById('clientNumber').value = '';
+    // uncheck radio buttons
     document.querySelectorAll('input[name="planDuration"]').forEach(radio => radio.checked = false);
     document.querySelectorAll('input[name="agreement"]').forEach(radio => radio.checked = false);
-    setTransactionIdField();
+    // clear transaction ID (no auto-generation)
+    clearTransactionIdField();
+    // clear any error styling
     document.querySelectorAll('.error-border').forEach(el => el.classList.remove('error-border'));
     document.querySelectorAll('.error-msg').forEach(el => el.remove());
     document.getElementById('submissionTimestamp').value = '';
-    showToast("🔄 Form has been reset. New transaction ID generated.", false);
+    showToast("🔄 Form has been reset. Transaction ID cleared — click 'Generate ID' to create a new one.", false);
   }
 
   async function handleSubmitAndReset() {
@@ -541,18 +551,23 @@
       resetFormCompletely();
     } else {
       alert(`⚠️ Submission failed: ${result.message}\nPlease check your network or try again later.`);
+      // Do not reset on failure so user can retry
     }
   }
 
   // ---------- EVENT LISTENERS ----------
+  // Generate ID button: fills transaction ID field
   document.getElementById('generateTxBtn').addEventListener('click', () => setTransactionIdField());
   document.getElementById('generateUssdOnlyBtn').addEventListener('click', handleGenerateUssdOnly);
   document.getElementById('submitResetBtn').addEventListener('click', handleSubmitAndReset);
   
+  // Input sanitization for client number and amount
   document.getElementById('clientNumber').addEventListener('input', (e) => { e.target.value = e.target.value.replace(/\D/g, '').slice(0,12); });
   document.getElementById('amount').addEventListener('input', (e) => { let v = e.target.value; if (v.startsWith('0') && v.length>1 && !v.startsWith('0.')) e.target.value = v.replace(/^0+/, ''); });
   
-  if (!document.getElementById('transactionId').value) setTransactionIdField();
+  // NO AUTO-GENERATION ON PAGE LOAD. Transaction ID field remains empty until user clicks button.
+  // Ensure transaction ID field starts empty (already empty in HTML)
+  clearTransactionIdField();
 </script>
 </body>
 </html>
