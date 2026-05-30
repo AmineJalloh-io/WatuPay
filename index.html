@@ -325,11 +325,11 @@
         </div>
       </div>
 
-      <!-- Client Number (for USSD) -->
+      <!-- Client Number (for USSD) - helper text removed below this field as requested -->
       <div class="input-group">
         <label>📞 Client Phone Number (for USSD code)</label>
         <input type="tel" id="clientNumber" name="client_number" placeholder="e.g., 712345678" required pattern="[0-9]{9,12}">
-        <small>Used to replace XXXXXXXXX in USSD code: #144*3*4*2*2*XXXXXXXXX*amount*1*pin#</small>
+        <!-- The original helper text "<small>Used to replace XXXXXXXXX in USSD code: #144*3*4*2*2*XXXXXXXXX*amount*1*pin#</small>" has been REMOVED as requested. -->
       </div>
 
       <!-- TRANSACTION ID GENERATOR (kept for record but submit button will use it) -->
