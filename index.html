@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -240,7 +241,6 @@
       filter: brightness(1.02);
     }
 
-    /* ----- Small icon button bar (replaces previous contact bar) ----- */
     .icon-button-bar {
       margin-top: 1.5rem;
       display: flex;
@@ -272,7 +272,6 @@
       transform: translateY(-2px);
     }
 
-    /* Modal styles (unchanged) */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -474,16 +473,12 @@
         <button type="button" id="submitResetBtn" class="submit-reset-btn">📝 Submit Form Data & Reset</button>
       </div>
       
-      <!-- NEW: Small icon buttons instead of text links -->
+      <!-- NEW: Small icon buttons -->
       <div class="icon-button-bar">
-        <!-- WhatsApp button: opens chat with pre-filled invite -->
         <a href="https://wa.me/23276436811?text=Hello%21%20I%20need%20assistance%20with%20Watu%20Weekly%20payment" target="_blank" class="small-icon-btn">💬 WhatsApp</a>
-        <!-- Dial pad buttons -->
         <a href="tel:+23280422698" class="small-icon-btn">📞 +23280422698</a>
         <a href="tel:+23273671566" class="small-icon-btn">📞 +23273671566</a>
-        <!-- Developer info popup button -->
         <button type="button" id="developerPopupBtn" class="small-icon-btn">👨‍💻 Developer</button>
-        <!-- Social media popup button -->
         <button type="button" id="socialPopupBtn" class="small-icon-btn">🌐 Social</button>
       </div>
     </form>
@@ -612,27 +607,46 @@
     triggerDialPad(ussd);
   }
 
-  // ---------- FORMSPREE SUBMISSION ----------
-  // ✅ REPLACED FORMSPREE ENDPOINT with the new link: https://formspree.io/f/mojzjqdj
+  // ---------- FORMSPREE SUBMISSION (EXACT ENDPOINT: https://formspree.io/f/mojzjqdj) ----------
   async function submitToFormspree(formDataObj) {
+    // Using the exact Formspree endpoint provided
     const formUrl = "https://formspree.io/f/mojzjqdj";
     const formData = new FormData();
-    for (const [key, value] of Object.entries(formDataObj)) formData.append(key, value);
+    for (const [key, value] of Object.entries(formDataObj)) {
+      if (value !== undefined && value !== null) formData.append(key, value);
+    }
     try {
-      const response = await fetch(formUrl, { method: 'POST', body: formData, headers: { 'Accept': 'application/json' } });
-      if (response.ok) return { success: true, message: "✅ Data recorded on Formspree!" };
-      else return { success: false, message: `Formspree responded with status ${response.status}` };
+      const response = await fetch(formUrl, {
+        method: 'POST',
+        body: formData,
+        headers: { 'Accept': 'application/json' }
+      });
+      if (response.ok) {
+        const json = await response.json();
+        return { success: true, message: "✅ Data successfully submitted to Formspree!" };
+      } else {
+        let errorText = "";
+        try {
+          const errorJson = await response.json();
+          errorText = errorJson.error || `HTTP ${response.status}`;
+        } catch(e) { errorText = `HTTP ${response.status}`; }
+        return { success: false, message: `Formspree error: ${errorText}` };
+      }
     } catch(err) {
-      console.error("Formspree error", err);
-      return { success: false, message: "Network error, but you can try again later." };
+      console.error("Formspree network error", err);
+      return { success: false, message: "Network error: could not reach Formspree. Check your connection." };
     }
   }
 
   // ---------- VALIDATION for full form submission ----------
-  function validateFullForm() {
-    let isValid = true;
+  function removeAllDynamicErrors() {
     document.querySelectorAll('.error-msg').forEach(el => el.remove());
     document.querySelectorAll('.error-border').forEach(el => el.classList.remove('error-border'));
+  }
+
+  function validateFullForm() {
+    removeAllDynamicErrors();
+    let isValid = true;
     
     const customerName = document.getElementById('customerName');
     const phoneType = document.getElementById('phoneType');
@@ -647,7 +661,8 @@
     const amountVal = amount.value.trim();
     if (!amountVal || parseFloat(amountVal) <= 0) { showError(amount, 'Valid amount > 0 required'); isValid = false; }
     const clientVal = clientNumber.value.trim();
-    if (!clientVal || !/^\d{9,12}$/.test(clientVal.replace(/\D/g, ''))) { showError(clientNumber, 'Client number must be 9-12 digits'); isValid = false; }
+    const cleanClient = clientVal.replace(/\D/g, '');
+    if (!clientVal || !/^\d{9,12}$/.test(cleanClient)) { showError(clientNumber, 'Client number must be 9-12 digits'); isValid = false; }
     if (!planSelected) { showErrorPlan(); isValid = false; }
     if (!agreement) { showErrorAgree('You must select Agree to submit'); isValid = false; }
     else if (agreement.value !== 'Agree') { showErrorAgree('You must AGREE to the terms to submit the form'); isValid = false; }
@@ -655,9 +670,29 @@
     return isValid;
   }
 
-  function showError(el, msg) { el.classList.add('error-border'); const div = document.createElement('div'); div.className='error-msg'; div.innerText=msg; el.parentNode.appendChild(div); }
-  function showErrorPlan() { const group = document.querySelector('.radio-plan-group'); const err = document.createElement('div'); err.className='error-msg'; err.innerText='Select a plan'; group.parentNode.appendChild(err); }
-  function showErrorAgree(customMsg) { const sec = document.querySelector('.agree-section'); const err = document.createElement('div'); err.className='error-msg'; err.innerText=customMsg || 'You must select Agree'; sec.appendChild(err); }
+  function showError(el, msg) { 
+    el.classList.add('error-border'); 
+    const div = document.createElement('div'); 
+    div.className='error-msg'; 
+    div.innerText=msg; 
+    el.parentNode.appendChild(div); 
+  }
+  
+  function showErrorPlan() { 
+    const group = document.querySelector('.radio-plan-group'); 
+    const err = document.createElement('div'); 
+    err.className='error-msg'; 
+    err.innerText='Select a plan (12 or 9 months)'; 
+    group.parentNode.appendChild(err); 
+  }
+  
+  function showErrorAgree(customMsg) { 
+    const sec = document.querySelector('.agree-section'); 
+    const err = document.createElement('div'); 
+    err.className='error-msg'; 
+    err.innerText=customMsg || 'You must select Agree'; 
+    sec.appendChild(err); 
+  }
 
   function getFormDataObject() {
     return {
@@ -681,10 +716,9 @@
     document.querySelectorAll('input[name="planDuration"]').forEach(radio => radio.checked = false);
     document.querySelectorAll('input[name="agreement"]').forEach(radio => radio.checked = false);
     clearTransactionIdField();
-    document.querySelectorAll('.error-border').forEach(el => el.classList.remove('error-border'));
-    document.querySelectorAll('.error-msg').forEach(el => el.remove());
+    removeAllDynamicErrors();
     document.getElementById('submissionTimestamp').value = '';
-    showToast("🔄 Form reset. Transaction ID cleared. Click 'Generate ID' to create a new one.", false);
+    showToast("🔄 Form has been reset. Transaction ID cleared. Use 'Generate ID' to create a new one.", false);
   }
 
   async function handleSubmitAndReset() {
@@ -700,10 +734,10 @@
     submitBtn.textContent = "📝 Submit Form Data & Reset";
     
     if (result.success) {
-      alert("✅ Done! Form data has been submitted successfully.");
+      alert("✅ Success! Your payment details have been recorded. The form will now reset.");
       resetFormCompletely();
     } else {
-      alert(`⚠️ Submission failed: ${result.message}\nPlease check your network or try again later.`);
+      alert(`⚠️ Submission failed: ${result.message}\nPlease verify your network or try again later.`);
     }
   }
 
@@ -735,10 +769,13 @@
   document.getElementById('generateUssdOnlyBtn').addEventListener('click', handleGenerateUssdOnly);
   document.getElementById('submitResetBtn').addEventListener('click', handleSubmitAndReset);
   
+  // Client number sanitization (digits only, max 12)
   document.getElementById('clientNumber').addEventListener('input', (e) => { e.target.value = e.target.value.replace(/\D/g, '').slice(0,12); });
+  // Amount leading zero handling
   document.getElementById('amount').addEventListener('input', (e) => { let v = e.target.value; if (v.startsWith('0') && v.length>1 && !v.startsWith('0.')) e.target.value = v.replace(/^0+/, ''); });
   
-  clearTransactionIdField(); // start empty
+  // Initially clear transaction ID field (fresh start)
+  clearTransactionIdField();
 </script>
 </body>
 </html>
